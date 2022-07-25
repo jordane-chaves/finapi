@@ -1,4 +1,5 @@
 import { InMemoryUsersRepository } from '../../repositories/in-memory/InMemoryUsersRepository';
+import { CreateUserError } from './CreateUserError';
 import { CreateUserUseCase } from './CreateUserUseCase'
 
 let inMemoryUsersRepository: InMemoryUsersRepository;
@@ -18,5 +19,17 @@ describe('Create User', () => {
     });
 
     expect(user).toHaveProperty('id');
-  })
+  });
+
+  it('should not be able to create an already existing user', async () => {
+    const user = {
+      name: 'Test User Existing',
+      email: 'existing-user@test.com',
+      password: '1234test',
+    };
+
+    await createUserUseCase.execute(user);
+
+    await expect(createUserUseCase.execute(user)).rejects.toBeInstanceOf(CreateUserError);
+  });
 });
