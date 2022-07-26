@@ -3,6 +3,7 @@ import { CreateUserUseCase } from '../../../users/useCases/createUser/CreateUser
 import { InMemoryStatementsRepository } from '../../repositories/in-memory/InMemoryStatementsRepository';
 import { CreateStatementUseCase } from '../createStatement/CreateStatementUseCase';
 import { ICreateStatementDTO } from '../createStatement/ICreateStatementDTO';
+import { GetStatementOperationError } from './GetStatementOperationError';
 import { GetStatementOperationUseCase } from './GetStatementOperationUseCase';
 
 let inMemoryUsersRepository: InMemoryUsersRepository;
@@ -50,5 +51,12 @@ describe('Get Statement Operation', () => {
     expect(statementOperation).toHaveProperty('id');
     expect(statementOperation.id).toEqual(statement.id);
     expect(statementOperation.user_id).toEqual(user.id);
+  });
+
+  it('should not be possible to get an operation from a non-existing account', async () => {
+    await expect(getStatementOperationUseCase.execute({
+      statement_id: 'statement-id',
+      user_id: 'id-non-existing-account',
+    })).rejects.toBeInstanceOf(GetStatementOperationError.UserNotFound);
   });
 });
