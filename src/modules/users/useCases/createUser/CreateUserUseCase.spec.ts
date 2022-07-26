@@ -1,6 +1,6 @@
 import { InMemoryUsersRepository } from '../../repositories/in-memory/InMemoryUsersRepository';
 import { CreateUserError } from './CreateUserError';
-import { CreateUserUseCase } from './CreateUserUseCase'
+import { CreateUserUseCase } from './CreateUserUseCase';
 
 let inMemoryUsersRepository: InMemoryUsersRepository;
 let createUserUseCase: CreateUserUseCase;
@@ -30,6 +30,7 @@ describe('Create User', () => {
 
     await createUserUseCase.execute(user);
 
-    await expect(createUserUseCase.execute(user)).rejects.toBeInstanceOf(CreateUserError);
+    await expect(createUserUseCase.execute(user))
+      .rejects.toBeInstanceOf(CreateUserError);
   });
 });
