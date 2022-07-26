@@ -76,4 +76,14 @@ describe('Create Statement', () => {
     } as ICreateStatementDTO))
       .rejects.toBeInstanceOf(CreateStatementError.UserNotFound);
   });
+
+  it('should not be able to make a withdraw to a non-existing account', async () => {
+    await expect(createStatementUseCase.execute({
+      amount: 300,
+      description: 'Withdraw a value',
+      type: 'withdraw',
+      user_id: 'non-existing-withdraw-id'
+    } as ICreateStatementDTO))
+      .rejects.toBeInstanceOf(CreateStatementError.UserNotFound);
+  });
 });
