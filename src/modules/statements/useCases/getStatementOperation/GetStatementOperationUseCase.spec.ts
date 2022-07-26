@@ -59,4 +59,17 @@ describe('Get Statement Operation', () => {
       user_id: 'id-non-existing-account',
     })).rejects.toBeInstanceOf(GetStatementOperationError.UserNotFound);
   });
+
+  it('should not be possible to get an non-existing operation', async () => {
+    const user = await createUserUseCase.execute({
+      name: 'User Statement',
+      email: 'user@operation-non-existing.com',
+      password: 'non-existing-operation-test'
+    });
+
+    await expect(getStatementOperationUseCase.execute({
+      user_id: user.id as string,
+      statement_id: 'id-non-existing-statement',
+    })).rejects.toBeInstanceOf(GetStatementOperationError.StatementNotFound);
+  });
 });
