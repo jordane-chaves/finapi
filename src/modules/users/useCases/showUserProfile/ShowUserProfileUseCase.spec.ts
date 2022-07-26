@@ -1,20 +1,21 @@
 import { InMemoryUsersRepository } from '../../repositories/in-memory/InMemoryUsersRepository';
 import { CreateUserUseCase } from '../createUser/CreateUserUseCase';
+import { ShowUserProfileError } from './ShowUserProfileError';
 import { ShowUserProfileUseCase } from './ShowUserProfileUseCase';
 
-let inMemoryUsersRespository: InMemoryUsersRepository;
+let inMemoryUsersRepository: InMemoryUsersRepository;
 let showUserProfileUseCase: ShowUserProfileUseCase;
 let createUserUseCase: CreateUserUseCase;
 
 describe('Show User Profile', () => {
   beforeAll(() => {
-    inMemoryUsersRespository = new InMemoryUsersRepository();
+    inMemoryUsersRepository = new InMemoryUsersRepository();
 
     showUserProfileUseCase = new ShowUserProfileUseCase(
-      inMemoryUsersRespository
+      inMemoryUsersRepository
     );
 
-    createUserUseCase = new CreateUserUseCase(inMemoryUsersRespository);
+    createUserUseCase = new CreateUserUseCase(inMemoryUsersRepository);
   });
 
   it("should be possible to display the user's profile", async () => {
@@ -27,5 +28,10 @@ describe('Show User Profile', () => {
     const userProfile = await showUserProfileUseCase.execute(user.id as string);
 
     expect(userProfile).toHaveProperty('id');
+  });
+
+  it('should not be possible to display the profile of a non-existing user', async () => {
+    await expect(showUserProfileUseCase.execute('non-existing-user-id'))
+      .rejects.toBeInstanceOf(ShowUserProfileError);
   });
 });
