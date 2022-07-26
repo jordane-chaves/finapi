@@ -10,7 +10,7 @@ let createStatementUseCase: CreateStatementUseCase;
 let createUserUseCase: CreateUserUseCase;
 
 describe('Create Statement', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository();
     inMemoryStatementsRepository = new InMemoryStatementsRepository();
     createStatementUseCase = new CreateStatementUseCase(
@@ -38,5 +38,31 @@ describe('Create Statement', () => {
     expect(statement).toHaveProperty('id');
     expect(statement.user_id).toEqual(user.id);
     expect(statement.amount).toEqual(100);
+  });
+
+  it('should be able to make a withdraw', async () => {
+    const user = await createUserUseCase.execute({
+      name: 'User Withdraw',
+      email: 'user-withdraw@test.com',
+      password: 'withdraw-test',
+    });
+
+    await createStatementUseCase.execute({
+      amount: 100,
+      description: 'Deposit a value',
+      type: 'deposit',
+      user_id: user.id as string
+    } as ICreateStatementDTO);
+
+    const statement = await createStatementUseCase.execute({
+      amount: 50,
+      description: 'Deposit a value',
+      type: 'withdraw',
+      user_id: user.id as string
+    } as ICreateStatementDTO);
+
+    expect(statement).toHaveProperty('id');
+    expect(statement.user_id).toEqual(user.id);
+    expect(statement.amount).toEqual(50);
   });
 });
