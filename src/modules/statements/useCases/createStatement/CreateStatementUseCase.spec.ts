@@ -1,6 +1,7 @@
 import { InMemoryUsersRepository } from '../../../users/repositories/in-memory/InMemoryUsersRepository';
 import { CreateUserUseCase } from '../../../users/useCases/createUser/CreateUserUseCase';
 import { InMemoryStatementsRepository } from '../../repositories/in-memory/InMemoryStatementsRepository';
+import { CreateStatementError } from './CreateStatementError';
 import { CreateStatementUseCase } from './CreateStatementUseCase';
 import { ICreateStatementDTO } from './ICreateStatementDTO';
 
@@ -64,5 +65,15 @@ describe('Create Statement', () => {
     expect(statement).toHaveProperty('id');
     expect(statement.user_id).toEqual(user.id);
     expect(statement.amount).toEqual(50);
+  });
+
+  it('should not be able to make a deposit to a non-existing account', async () => {
+    await expect(createStatementUseCase.execute({
+      amount: 500,
+      description: 'Deposit a value',
+      type: 'deposit',
+      user_id: 'non-existing-deposit-id'
+    } as ICreateStatementDTO))
+      .rejects.toBeInstanceOf(CreateStatementError.UserNotFound);
   });
 });
