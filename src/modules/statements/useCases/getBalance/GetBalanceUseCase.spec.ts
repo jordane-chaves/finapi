@@ -2,6 +2,7 @@ import { GetBalanceUseCase } from './GetBalanceUseCase';
 import { InMemoryStatementsRepository } from '../../repositories/in-memory/InMemoryStatementsRepository';
 import { InMemoryUsersRepository } from '../../../users/repositories/in-memory/InMemoryUsersRepository';
 import { CreateUserUseCase } from '../../../users/useCases/createUser/CreateUserUseCase';
+import { GetBalanceError } from './GetBalanceError';
 
 let inMemoryStatementsRepository: InMemoryStatementsRepository;
 let inMemoryUsersRepository: InMemoryUsersRepository;
@@ -33,5 +34,11 @@ describe('Get Balance', () => {
 
     expect(balance).toHaveProperty('statement');
     expect(balance).toHaveProperty('balance');
+  });
+
+  it('should not be able to get the balance of the non-existing account', async () => {
+    await expect(getBalanceUseCase.execute({
+      user_id: 'non-existing-account-id'
+    })).rejects.toBeInstanceOf(GetBalanceError);
   });
 });
