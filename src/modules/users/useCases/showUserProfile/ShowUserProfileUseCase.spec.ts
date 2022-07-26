@@ -8,7 +8,7 @@ let showUserProfileUseCase: ShowUserProfileUseCase;
 let createUserUseCase: CreateUserUseCase;
 
 describe('Show User Profile', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     inMemoryUsersRepository = new InMemoryUsersRepository();
 
     showUserProfileUseCase = new ShowUserProfileUseCase(

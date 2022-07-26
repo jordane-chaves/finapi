@@ -10,7 +10,7 @@ let getBalanceUseCase: GetBalanceUseCase;
 let createUserUseCase: CreateUserUseCase;
 
 describe('Get Balance', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     inMemoryStatementsRepository = new InMemoryStatementsRepository();
     inMemoryUsersRepository = new InMemoryUsersRepository();
     getBalanceUseCase = new GetBalanceUseCase(
