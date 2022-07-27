@@ -37,4 +37,30 @@ describe('CreateStatementController', () => {
     expect(response.body).toHaveProperty('id');
     expect(response.body.amount).toEqual(100);
   });
+
+  it('should be able to make a withdraw', async () => {
+    const user = {
+      name: 'User Withdraw',
+      email: 'user-withdraw@test.com',
+      password: 'password-withdraw',
+    };
+
+    await request(app).post('/api/v1/users').send(user);
+    const tokenResponse = await request(app).post('/api/v1/sessions').send(user);
+    const { token } = tokenResponse.body;
+
+    await request(app)
+      .post('/api/v1/statements/deposit')
+      .send({ amount: 100, description: "Test deposit 100." })
+      .set({ Authorization: `Bearer ${token}` });
+
+    const response = await request(app)
+      .post('/api/v1/statements/withdraw')
+      .send({ amount: 30, description: "Test withdraw" })
+      .set({ Authorization: `Bearer ${token}` });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('id');
+    expect(response.body.amount).toEqual(30);
+  });
 });
