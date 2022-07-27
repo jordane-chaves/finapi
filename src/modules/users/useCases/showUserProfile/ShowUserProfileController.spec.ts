@@ -38,4 +38,13 @@ describe('ShowUserProfileController', () => {
     expect(response.body.name).toEqual(user.name);
     expect(response.body.email).toEqual(user.email);
   });
+
+  it('should not be possible to display the profile of a non-existing user', async () => {
+    const response = await request(app).get('/api/v1/profile').set({
+      Authorization: `Bearer invalid-user-token`,
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message');
+  });
 });
