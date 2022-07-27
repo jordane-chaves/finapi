@@ -43,4 +43,13 @@ describe('GetStatementOperationController', () => {
     expect(response.body).toHaveProperty('id');
     expect(response.body.amount).toEqual('80.00');
   });
+
+  it('should not be possible to get an operation from a non-existing account', async () => {
+    const response = await request(app)
+      .get(`/api/v1/statements/operation-id`)
+      .set({ Authorization: `Bearer token-non-existent-account` });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message');
+  });
 });
