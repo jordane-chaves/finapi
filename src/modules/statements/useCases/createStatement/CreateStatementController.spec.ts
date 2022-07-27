@@ -73,4 +73,14 @@ describe('CreateStatementController', () => {
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('message');
   });
+
+  it('should not be able to make a withdraw to a non-existing account', async () => {
+    const response = await request(app)
+      .post('/api/v1/statements/withdraw')
+      .send({ amount: 100, description: "Test withdraw" })
+      .set({ Authorization: `Bearer token-non-existent-user-account` });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message');
+  });
 });
