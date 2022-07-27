@@ -44,4 +44,22 @@ describe('AuthenticateUserController', () => {
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('message');
   });
+
+  it('should not be able to authenticate user with incorrect password', async () => {
+    const user = {
+      name: "User Incorrect Password",
+      email: "user-incorect@password.com",
+      password: "password-test"
+    };
+
+    await request(app).post('/api/v1/users').send(user);
+
+    const response = await request(app).post('/api/v1/sessions').send({
+      email: user.email,
+      password: 'incorrect-password'
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message');
+  });
 });
