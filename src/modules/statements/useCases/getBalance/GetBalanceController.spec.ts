@@ -36,4 +36,13 @@ describe('GetBalanceController', () => {
     expect(response.body).toHaveProperty('statement');
     expect(response.body).toHaveProperty('balance');
   });
+
+  it('should not be able to get the balance of the non-existing account', async () => {
+    const response = await request(app).get('/api/v1/statements/balance').set({
+      Authorization: `Bearer invalid-user-token`,
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message');
+  });
 });
