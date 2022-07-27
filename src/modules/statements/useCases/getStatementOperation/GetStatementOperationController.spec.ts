@@ -52,4 +52,24 @@ describe('GetStatementOperationController', () => {
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('message');
   });
+
+  it('should not be possible to get an non-existing operation', async () => {
+    const user = {
+      name: 'User Non-Existing Operation',
+      email: 'user-non-existing-operation@test.com',
+      password: 'non-existing-operation',
+    };
+
+    await request(app).post('/api/v1/users').send(user);
+    const tokenResponse = await request(app).post('/api/v1/sessions').send(user);
+    const { token } = tokenResponse.body;
+
+    const response = await request(app)
+      .get(`/api/v1/statements/non-existent-operation-id`)
+      .set({ Authorization: `Bearer ${token}` });
+
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty('message');
+    expect(response.body.status).toEqual('error');
+  });
 });
