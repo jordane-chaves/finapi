@@ -63,4 +63,14 @@ describe('CreateStatementController', () => {
     expect(response.body).toHaveProperty('id');
     expect(response.body.amount).toEqual(30);
   });
+
+  it('should not be able to make a deposit to a non-existing account', async () => {
+    const response = await request(app)
+      .post('/api/v1/statements/deposit')
+      .send({ amount: 100, description: "Test deposit" })
+      .set({ Authorization: `Bearer token-non-existent-user-account` });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message');
+  });
 });
