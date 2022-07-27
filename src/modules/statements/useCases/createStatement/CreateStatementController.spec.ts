@@ -83,4 +83,29 @@ describe('CreateStatementController', () => {
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('message');
   });
+
+  it('should not be able to make a withdrawal for insufficient funds', async () => {
+    const user = {
+      name: 'User Insufficient Funds',
+      email: 'insufficient-funds@test.com',
+      password: 'password-insufficient-funds',
+    };
+
+    await request(app).post('/api/v1/users').send(user);
+    const tokenResponse = await request(app).post('/api/v1/sessions').send(user);
+    const { token } = tokenResponse.body;
+
+    await request(app)
+      .post('/api/v1/statements/deposit')
+      .send({ amount: 50, description: "Test deposit." })
+      .set({ Authorization: `Bearer ${token}` });
+
+    const response = await request(app)
+      .post('/api/v1/statements/withdraw')
+      .send({ amount: 100, description: "Test withdraw" })
+      .set({ Authorization: `Bearer ${token}` });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message');
+  });
 });
