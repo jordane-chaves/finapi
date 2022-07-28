@@ -7,6 +7,12 @@ interface IOptions {
 getConnectionOptions().then(options => {
   const newOptions = options as IOptions;
   newOptions.host = 'database';
+
+  if(process.env.NODE_ENV !== 'test'){
+    createConnection({
+        ...options
+    });
+  }
 });
 
 export default async(host = 'database'): Promise<Connection> => {
