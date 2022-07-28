@@ -1,6 +1,7 @@
 import { Connection } from 'typeorm';
 import request from 'supertest';
 
+import { BalanceMap } from '../../mappers/BalanceMap';
 import { app } from '../../../../app';
 import createConnection from '../../../../database';
 
@@ -32,9 +33,11 @@ describe('GetBalanceController', () => {
       Authorization: `Bearer ${token}`,
     });
 
+    const balance = BalanceMap.toDTO(response.body);
+
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('statement');
-    expect(response.body).toHaveProperty('balance');
+    expect(balance).toHaveProperty('statement');
+    expect(balance).toHaveProperty('balance');
   });
 
   it('should not be able to get the balance of the non-existing account', async () => {
