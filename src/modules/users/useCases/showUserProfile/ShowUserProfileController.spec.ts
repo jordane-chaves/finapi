@@ -1,6 +1,7 @@
 import { Connection } from 'typeorm';
 import request from 'supertest';
 
+import { ProfileMap } from '../../mappers/ProfileMap';
 import { app } from '../../../../app';
 import createConnection from '../../../../database';
 
@@ -33,10 +34,12 @@ describe('ShowUserProfileController', () => {
       Authorization: `Bearer ${token}`,
     });
 
+    const userProfile = ProfileMap.toDTO(response.body);
+
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('id');
-    expect(response.body.name).toEqual(user.name);
-    expect(response.body.email).toEqual(user.email);
+    expect(userProfile).toHaveProperty('id');
+    expect(userProfile.name).toEqual(user.name);
+    expect(userProfile.email).toEqual(user.email);
   });
 
   it('should not be possible to display the profile of a non-existing user', async () => {
