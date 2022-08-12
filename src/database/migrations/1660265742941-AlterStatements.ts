@@ -3,6 +3,12 @@ import {MigrationInterface, QueryRunner, TableColumn, TableForeignKey} from "typ
 export class AlterStatements1660265742941 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+      await queryRunner.changeColumn('statements', 'type', new TableColumn({
+          name: 'type',
+          type: 'enum',
+          enum: ['deposit', 'withdraw', 'transfer']
+        }));
+
       await queryRunner.addColumn('statements', new TableColumn({
         name: 'sender_id',
         type: 'uuid',
@@ -22,6 +28,11 @@ export class AlterStatements1660265742941 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
       await queryRunner.dropForeignKey('statements', 'FKStatementSenderUser');
       await queryRunner.dropColumn('statements', 'sender_id');
+      await queryRunner.changeColumn('statements', 'type', new TableColumn({
+          name: 'type',
+          type: 'enum',
+          enum: ['deposit', 'withdraw']
+      }));
     }
 
 }
