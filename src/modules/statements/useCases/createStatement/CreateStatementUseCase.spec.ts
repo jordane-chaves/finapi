@@ -109,4 +109,66 @@ describe('Create Statement', () => {
     } as ICreateStatementDTO))
       .rejects.toBeInstanceOf(CreateStatementError.InsufficientFunds);
   });
+
+  it('should be able to make a transfer', async () => {
+    const senderUser = await createUserUseCase.execute({
+      name: 'Sender User',
+      email: 'sender-user-transfer@test.com',
+      password: 'transfer-test',
+    });
+
+    const receiverUser = await createUserUseCase.execute({
+      name: 'Receiver User',
+      email: 'receiver-user-transfer@test.com',
+      password: 'transfer-test-receiver',
+    });
+
+    await createStatementUseCase.execute({
+      amount: 100,
+      description: 'Deposit a value',
+      type: 'deposit',
+      user_id: senderUser.id,
+    } as ICreateStatementDTO);
+
+    const statement = await createStatementUseCase.execute({
+      amount: 50,
+      description: 'Transfer a value',
+      type: 'transfer',
+      user_id: receiverUser.id,
+      sender_id: senderUser.id
+    } as ICreateStatementDTO);
+
+    expect(statement).toHaveProperty('id');
+    expect(statement).toHaveProperty('sender_id');
+  });
+
+  it('should not be able to make a transfer with insufficient funds', async () => {
+    const senderUser = await createUserUseCase.execute({
+      name: 'Sender User Transfer',
+      email: 'sender-user-insufficient-founds@test-insufficient-funds.com',
+      password: 'insufficient-test-transfer',
+    });
+
+    const receiverUser = await createUserUseCase.execute({
+      name: 'Receiver User Transfer',
+      email: 'receiver-user-transfer@test-insufficient-funds.com',
+      password: 'any-password',
+    });
+
+    await createStatementUseCase.execute({
+      amount: 200,
+      description: 'Deposit a value',
+      type: 'deposit',
+      user_id: senderUser.id
+    } as ICreateStatementDTO);
+
+    await expect(createStatementUseCase.execute({
+      amount: 600,
+      description: 'Try transfer insufficient value',
+      type: 'transfer',
+      user_id: receiverUser.id,
+      sender_id: senderUser.id
+    } as ICreateStatementDTO))
+      .rejects.toBeInstanceOf(CreateStatementError.InsufficientFunds);
+  });
 });
