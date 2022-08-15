@@ -23,7 +23,7 @@ export class CreateStatementController {
     const createStatement = container.resolve(CreateStatementUseCase);
 
     const statement = await createStatement.execute({
-      user_id: user_id ?? sender_id,
+      user_id: user_id || sender_id,
       type,
       amount,
       description,
