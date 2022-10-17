@@ -34,6 +34,10 @@ export class InMemoryStatementsRepository implements IStatementsRepository {
     const balance = statement.reduce((acc, operation) => {
       if (operation.type === 'deposit') {
         return acc + parseFloat(`${operation.amount}`);
+      } else if (operation.type === 'transfer') {
+        return operation.sender_id === user_id
+          ? acc - parseFloat(`${operation.amount}`)
+          : acc + parseFloat(`${operation.amount}`);
       } else {
         return acc - parseFloat(`${operation.amount}`);
       }
