@@ -22,24 +22,22 @@ export class CreateStatementUseCase {
       throw new CreateStatementError.UserNotFound();
     }
 
-    if (type === 'withdraw' || type === 'transfer') {
-      const { balance } = await this.statementsRepository.getUserBalance({
-        user_id: sender_id || user_id
+    let statement;
+
+    if (type === 'withdraw') {
+      statement = await this.statementsRepository.getUserBalance({
+        user_id
       });
+    }
 
-      if (balance < amount) {
-        throw new CreateStatementError.InsufficientFunds();
-      }
+    if (type === 'transfer') {
+      statement = await this.statementsRepository.getUserBalance({
+        user_id: sender_id as string
+      });
+    }
 
-      if (sender_id) {
-        await this.statementsRepository.create({
-          user_id: sender_id,
-          amount,
-          description,
-          type,
-          sender_id
-        } as ICreateStatementDTO);
-      }
+    if (statement && statement.balance < amount) {
+      throw new CreateStatementError.InsufficientFunds();
     }
 
     const statementOperation = await this.statementsRepository.create({

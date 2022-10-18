@@ -53,6 +53,40 @@ describe('Get Statement Operation', () => {
     expect(statementOperation.user_id).toEqual(user.id);
   });
 
+  it('should be able to get a transfer statement operation', async () => {
+    const senderUser = await createUserUseCase.execute({
+      name: 'Sender User Test',
+      email: 'sender-user@test.com',
+      password: 'any-password',
+    });
+
+    const receiverUser = await createUserUseCase.execute({
+      name: 'Receiver User Test',
+      email: 'receiver-user@test.com',
+      password: 'any-password',
+    });
+
+    await createStatementUseCase.execute({
+      amount: 100,
+      description: 'Deposit a new value',
+      type: 'deposit',
+      user_id: senderUser.id,
+    } as ICreateStatementDTO);
+
+    const statement = await createStatementUseCase.execute({
+      amount: 100,
+      description: 'Transfer a value',
+      type: 'transfer',
+      user_id: receiverUser.id,
+      sender_id: senderUser.id,
+    } as ICreateStatementDTO);
+
+    await expect(getStatementOperationUseCase.execute({
+      statement_id: statement.id as string,
+      user_id: senderUser.id as string,
+    })).resolves.toEqual(statement);
+  });
+
   it('should not be possible to get an operation from a non-existing account', async () => {
     await expect(getStatementOperationUseCase.execute({
       statement_id: 'statement-id',

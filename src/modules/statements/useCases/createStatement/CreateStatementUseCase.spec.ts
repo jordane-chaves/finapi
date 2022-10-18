@@ -55,16 +55,27 @@ describe('Create Statement', () => {
       user_id: user.id as string
     } as ICreateStatementDTO);
 
-    const statement = await createStatementUseCase.execute({
+    await createStatementUseCase.execute({
       amount: 50,
-      description: 'Deposit a value',
+      description: 'Withdraw a value',
       type: 'withdraw',
       user_id: user.id as string
     } as ICreateStatementDTO);
 
+    const statement = await createStatementUseCase.execute({
+      amount: 20,
+      description: 'Withdraw a value',
+      type: 'withdraw',
+      user_id: user.id as string
+    } as ICreateStatementDTO);
+
+    const { balance } = await inMemoryStatementsRepository.getUserBalance({
+      user_id: user.id as string
+    });
+
     expect(statement).toHaveProperty('id');
     expect(statement.user_id).toEqual(user.id);
-    expect(statement.amount).toEqual(50);
+    expect(balance).toEqual(30);
   });
 
   it('should not be able to make a deposit to a non-existing account', async () => {
@@ -124,7 +135,7 @@ describe('Create Statement', () => {
     });
 
     await createStatementUseCase.execute({
-      amount: 100,
+      amount: 120,
       description: 'Deposit a value',
       type: 'deposit',
       user_id: senderUser.id,
@@ -138,8 +149,14 @@ describe('Create Statement', () => {
       sender_id: senderUser.id
     } as ICreateStatementDTO);
 
+    const balance = await inMemoryStatementsRepository.getUserBalance({
+      user_id: senderUser.id as string,
+      with_statement: true,
+    });
+
     expect(statement).toHaveProperty('id');
     expect(statement).toHaveProperty('sender_id');
+    expect(balance.balance).toEqual(70);
   });
 
   it('should not be able to make a transfer with insufficient funds', async () => {

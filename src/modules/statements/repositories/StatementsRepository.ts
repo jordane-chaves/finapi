@@ -31,9 +31,21 @@ export class StatementsRepository implements IStatementsRepository {
     return this.repository.save(statement);
   }
 
-  async findStatementOperation({ statement_id, user_id }: IGetStatementOperationDTO): Promise<Statement | undefined> {
-    return this.repository.findOne(statement_id, {
-      where: { user_id }
+  async findStatementOperation({
+    statement_id,
+    user_id,
+  }: IGetStatementOperationDTO): Promise<Statement | undefined> {
+    return this.repository.findOne({
+      where: [
+        {
+          id: statement_id,
+          user_id
+        },
+        {
+          id: statement_id,
+          sender_id: user_id
+        }
+      ],
     });
   }
 
@@ -43,7 +55,7 @@ export class StatementsRepository implements IStatementsRepository {
     >
   {
     const statement = await this.repository.find({
-      where: { user_id }
+      where: [{ user_id }, { sender_id: user_id }]
     });
 
     const balance = statement.reduce((acc, operation) => {
@@ -56,7 +68,7 @@ export class StatementsRepository implements IStatementsRepository {
       } else {
         return acc - parseFloat(`${operation.amount}`);
       }
-    }, 0)
+    }, 0);
 
     if (with_statement) {
       return {
