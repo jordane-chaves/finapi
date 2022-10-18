@@ -188,4 +188,28 @@ describe('Create Statement', () => {
     } as ICreateStatementDTO))
       .rejects.toBeInstanceOf(CreateStatementError.InsufficientFunds);
   });
+
+  it('should not be possible to transfer to yourself', async () => {
+    const user = await createUserUseCase.execute({
+      name: 'User Transfer Yourself',
+      email: 'transfer-yourself@test.com',
+      password: 'any-password',
+    });
+
+    await createStatementUseCase.execute({
+      amount: 100,
+      description: 'Deposit a value',
+      type: 'deposit',
+      user_id: user.id,
+    } as ICreateStatementDTO);
+
+    await expect(createStatementUseCase.execute({
+      amount: 50,
+      description: 'Transfer a value',
+      type: 'transfer',
+      user_id: user.id,
+      sender_id: user.id,
+    } as ICreateStatementDTO))
+      .rejects.toBeInstanceOf(CreateStatementError.NotTransferYourself);
+  });
 });

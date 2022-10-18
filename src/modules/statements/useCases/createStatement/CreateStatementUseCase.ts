@@ -22,6 +22,10 @@ export class CreateStatementUseCase {
       throw new CreateStatementError.UserNotFound();
     }
 
+    if (user_id === sender_id) {
+      throw new CreateStatementError.NotTransferYourself();
+    }
+
     let statement;
 
     if (type === 'withdraw') {
