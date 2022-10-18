@@ -30,8 +30,7 @@ export class InMemoryStatementsRepository implements IStatementsRepository {
     >
   {
     const statement = this.statements.filter(operation =>
-      operation.user_id === user_id
-      || operation.sender_id === user_id
+      operation.user_id === user_id || operation.sender_id === user_id
     );
 
     const balance = statement.reduce((acc, operation) => {
